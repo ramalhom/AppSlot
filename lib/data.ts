@@ -8,166 +8,12 @@ const DEFAULT_DATA: AppData = {
   matches: [
     {
       id: '1',
-      date: '2025-10-04',
+      date: '2026-10-04',
       heure: '15:30',
       equipeDomicile: 'Sensler FHC',
       equipeExterieur: 'HC Murten',
       lieu: 'Sportzentrum Sense, Tafers',
       categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '2',
-      date: '2025-10-11',
-      heure: '17:00',
-      equipeDomicile: 'UH Düdingen',
-      equipeExterieur: 'Sensler FHC',
-      lieu: 'Düdingen Sportzentrum',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '3',
-      date: '2025-10-18',
-      heure: '15:00',
-      equipeDomicile: 'Sensler FHC',
-      equipeExterieur: 'HC Freiburg',
-      lieu: 'Sportzentrum Sense, Tafers',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '4',
-      date: '2025-11-08',
-      heure: '16:00',
-      equipeDomicile: 'HC Plaffeien',
-      equipeExterieur: 'Sensler FHC',
-      lieu: 'Sportanlage Plaffeien',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '5',
-      date: '2025-11-15',
-      heure: '15:30',
-      equipeDomicile: 'Sensler FHC',
-      equipeExterieur: 'UH Flamatt',
-      lieu: 'Sportzentrum Sense, Tafers',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '6',
-      date: '2025-11-22',
-      heure: '17:30',
-      equipeDomicile: 'HC Murten',
-      equipeExterieur: 'UH Düdingen',
-      lieu: 'Sportzentrum Murten',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '7',
-      date: '2025-12-06',
-      heure: '15:00',
-      equipeDomicile: 'Sensler FHC',
-      equipeExterieur: 'HC Plaffeien',
-      lieu: 'Sportzentrum Sense, Tafers',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '8',
-      date: '2025-12-13',
-      heure: '16:00',
-      equipeDomicile: 'UH Flamatt',
-      equipeExterieur: 'HC Freiburg',
-      lieu: 'Sportanlage Flamatt',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '9',
-      date: '2026-01-10',
-      heure: '15:30',
-      equipeDomicile: 'HC Freiburg',
-      equipeExterieur: 'Sensler FHC',
-      lieu: 'Salle omnisports Freiburg',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '10',
-      date: '2026-01-17',
-      heure: '16:30',
-      equipeDomicile: 'Sensler FHC',
-      equipeExterieur: 'UH Düdingen',
-      lieu: 'Sportzentrum Sense, Tafers',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '11',
-      date: '2026-01-24',
-      heure: '15:00',
-      equipeDomicile: 'UH Düdingen',
-      equipeExterieur: 'HC Plaffeien',
-      lieu: 'Düdingen Sportzentrum',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '12',
-      date: '2026-02-07',
-      heure: '17:00',
-      equipeDomicile: 'HC Plaffeien',
-      equipeExterieur: 'UH Flamatt',
-      lieu: 'Sportanlage Plaffeien',
-      categorie: '1ère ligue',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '13',
-      date: '2026-02-14',
-      heure: '15:30',
-      equipeDomicile: 'Sensler FHC',
-      equipeExterieur: 'HC Murten',
-      lieu: 'Sportzentrum Sense, Tafers',
-      categorie: '1ère ligue - Retour',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '14',
-      date: '2026-02-21',
-      heure: '16:00',
-      equipeDomicile: 'HC Murten',
-      equipeExterieur: 'HC Freiburg',
-      lieu: 'Sportzentrum Murten',
-      categorie: '1ère ligue - Retour',
-      arbitre1: null,
-      arbitre2: null,
-    },
-    {
-      id: '15',
-      date: '2026-03-07',
-      heure: '15:00',
-      equipeDomicile: 'UH Flamatt',
-      equipeExterieur: 'Sensler FHC',
-      lieu: 'Sportanlage Flamatt',
-      categorie: 'Playoffs',
       arbitre1: null,
       arbitre2: null,
     },
@@ -194,13 +40,13 @@ export async function getData(): Promise<AppData> {
   try {
     // Essayer de récupérer le blob existant
     const blobs = await list({ prefix: BLOB_KEY });
-    
+
     if (blobs.blobs.length > 0) {
       const response = await fetch(blobs.blobs[0].url);
       const data = await response.json() as AppData;
       return data;
     }
-    
+
     // Premier démarrage : créer le blob avec les données par défaut
     return await saveData(DEFAULT_DATA);
   } catch (error) {
@@ -211,7 +57,7 @@ export async function getData(): Promise<AppData> {
 
 export async function saveData(data: AppData): Promise<AppData> {
   const updatedData = { ...data, lastUpdated: new Date().toISOString() };
-  
+
   // Mode développement sans Vercel Blob
   if (isLocalDev) {
     localData = updatedData;

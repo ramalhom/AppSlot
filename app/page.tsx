@@ -7,8 +7,8 @@ import SignupModal from '@/components/SignupModal';
 import Toast, { ToastItem } from '@/components/Toast';
 
 const MONTHS_FR = [
-  'Janvier','Février','Mars','Avril','Mai','Juin',
-  'Juillet','Août','Septembre','Octobre','Novembre','Décembre'
+  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
 ];
 
 const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -166,7 +166,7 @@ export default function Home() {
   const fullMatches = data?.matches.filter((m) => m.arbitre1 && m.arbitre2).length ?? 0;
   const myMatches = data?.matches.filter((m) =>
     myName && (m.arbitre1?.toLowerCase() === myName.toLowerCase() ||
-    m.arbitre2?.toLowerCase() === myName.toLowerCase())
+      m.arbitre2?.toLowerCase() === myName.toLowerCase())
   ).length ?? 0;
 
   return (
@@ -178,7 +178,7 @@ export default function Home() {
             <div className="logo-icon">🏒</div>
             <div className="logo-text">
               <div className="logo-title">Sensler Cup</div>
-              <div className="logo-subtitle">Arbitres — Saison 2025-2026</div>
+              <div className="logo-subtitle">Arbitres — Saison 2026-2027</div>
             </div>
           </div>
           <div className="header-actions">
@@ -198,7 +198,7 @@ export default function Home() {
         {/* Hero */}
         <section className="hero">
           <div className="hero-badge">
-            <span>🏒</span> Saison 2025-2026
+            <span>🏒</span> Saison 2026-2027
           </div>
           <h1>Programme des Arbitres</h1>
           <p>
