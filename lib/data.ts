@@ -222,7 +222,7 @@ export async function saveData(data: AppData): Promise<AppData> {
     await put(BLOB_KEY, JSON.stringify(updatedData, null, 2), {
       access: 'public',
       contentType: 'application/json',
-      allowOverwrite: true,
+      addRandomSuffix: false,
     });
     return updatedData;
   } catch (error) {
