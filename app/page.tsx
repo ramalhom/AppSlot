@@ -82,11 +82,11 @@ export default function Home() {
     fetchData();
   }, [fetchData]);
 
-  // Polling every 5s for real-time updates
+  // Polling every 30s for real-time updates
   useEffect(() => {
     pollRef.current = setInterval(() => {
       fetchData(true);
-    }, 5000);
+    }, 30000);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
@@ -98,50 +98,111 @@ export default function Home() {
     if (saved) setMyName(saved);
   }, []);
 
-  const handleSignup = async (nomArbitre: string, match: Match, slot: 'arbitre1' | 'arbitre2') => {
+  const handleSignup = async (
+    nomArbitre: string,
+    match: Match,
+    slot: 'arbitre1' | 'arbitre2'
+  ) => {
     try {
       const res = await fetch('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ matchId: match.id, slot, nomArbitre }),
+        body: JSON.stringify({
+          matchId: match.id,
+          slot,
+          nomArbitre,
+        }),
       });
-      const json = await res.json();
-      if (json.success) {
-        // Save name for future use
-        localStorage.setItem('arbitre_name', nomArbitre);
-        setMyName(nomArbitre);
 
-        addToast(`✅ Inscription confirmée pour ${match.equipeDomicile} - ${match.equipeExterieur} !`, 'success');
-      } else {
-        addToast(json.error || 'Erreur lors de l\'inscription', 'error');
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        addToast(
+          json.error || "Erreur lors de l'inscription",
+          'error'
+        );
+        return;
       }
-      void fetchData(true);
+
+      // Mise à jour immédiate du match affiché, sans relire le Blob.
+      setData((current) => {
+        if (!current) return current;
+
+        return {
+          ...current,
+          matches: current.matches.map((item) =>
+            item.id === json.data.id ? json.data : item
+          ),
+        };
+      });
+
+      setLastUpdated(new Date());
+
+      // Mémoriser le nom pour les prochaines inscriptions
+      localStorage.setItem('arbitre_name', nomArbitre);
+      setMyName(nomArbitre);
+
+      addToast(
+        `✅ Inscription confirmée pour ${match.equipeDomicile} - ${match.equipeExterieur} !`,
+        'success'
+      );
+
       setSignupModal(null);
-    } catch {
-      addToast('Erreur de connexion', 'error');
+    } catch (error) {
+      console.error("Erreur lors de l'inscription :", error);
+      addToast('Erreur de connexion au serveur', 'error');
     }
   };
 
-  const handleUnsubscribe = async (match: Match, slot: 'arbitre1' | 'arbitre2') => {
+
+  const handleUnsubscribe = async (
+    match: Match,
+    slot: 'arbitre1' | 'arbitre2'
+  ) => {
     const currentName = match[slot];
+
     if (!currentName) return;
 
     try {
       const res = await fetch('/api/signup', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ matchId: match.id, slot, nomArbitre: currentName }),
+        body: JSON.stringify({
+          matchId: match.id,
+          slot,
+          nomArbitre: currentName,
+        }),
       });
+
       const json = await res.json();
-      if (json.success) {
-        addToast('Désinscription effectuée', 'info');
-      } else {
-        addToast(json.error || 'Erreur lors de la désinscription', 'error');
+
+      if (!res.ok || !json.success) {
+        addToast(
+          json.error || 'Erreur lors de la désinscription',
+          'error'
+        );
+        return;
       }
-      void fetchData(true);
+
+      // Mise à jour immédiate du match affiché, sans relire le Blob.
+      setData((current) => {
+        if (!current) return current;
+
+        return {
+          ...current,
+          matches: current.matches.map((item) =>
+            item.id === json.data.id ? json.data : item
+          ),
+        };
+      });
+
+      setLastUpdated(new Date());
+
+      addToast('Désinscription effectuée', 'info');
       setSignupModal(null);
-    } catch {
-      addToast('Erreur de connexion', 'error');
+    } catch (error) {
+      console.error('Erreur lors de la désinscription :', error);
+      addToast('Erreur de connexion au serveur', 'error');
     }
   };
 
