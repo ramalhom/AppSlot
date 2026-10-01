@@ -50,6 +50,7 @@ export default function Home() {
   } | null>(null);
   const [myName, setMyName] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'open' | 'upcoming'>('upcoming');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -91,6 +92,17 @@ export default function Home() {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [fetchData]);
+
+  // Load the saved theme. Light mode is used for first-time visitors.
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('appslot_theme');
+    if (savedTheme === 'dark' || savedTheme === 'light') setTheme(savedTheme);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('appslot_theme', theme);
+  }, [theme]);
 
   // Load saved name
   useEffect(() => {
@@ -245,6 +257,15 @@ export default function Home() {
             </div>
           </div>
           <div className="header-actions">
+            <button
+              className="btn btn-secondary btn-sm theme-toggle"
+              onClick={() => setTheme((current) => current === 'light' ? 'dark' : 'light')}
+              aria-label={`Activer le mode ${theme === 'light' ? 'sombre' : 'clair'}`}
+              title={`Activer le mode ${theme === 'light' ? 'sombre' : 'clair'}`}
+              id="btn-theme"
+            >
+              {theme === 'light' ? '☀️ Clair' : '🌙 Sombre'}
+            </button>
             <span className="live-dot">En direct</span>
             <button
               className={`btn btn-sm ${adminLoggedIn ? 'btn-success' : 'btn-secondary'}`}
