@@ -133,8 +133,8 @@ export default function Home() {
       });
       const json = await res.json();
       if (json.success) {
-        addToast('Désinscription effectuée', 'info');
         await fetchData(true);
+        addToast('Désinscription effectuée', 'info');
       } else {
         addToast(json.error || 'Erreur lors de la désinscription', 'error');
       }
