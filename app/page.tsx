@@ -110,9 +110,9 @@ export default function Home() {
         // Save name for future use
         localStorage.setItem('arbitre_name', nomArbitre);
         setMyName(nomArbitre);
-        addToast(`✅ Inscription confirmée pour ${match.equipeDomicile} - ${match.equipeExterieur} !`, 'success');
         await fetchData(true);
         setSignupModal(null);
+        addToast(`✅ Inscription confirmée pour ${match.equipeDomicile} - ${match.equipeExterieur} !`, 'success');
       } else {
         addToast(json.error || 'Erreur lors de l\'inscription', 'error');
       }
