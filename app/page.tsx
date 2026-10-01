@@ -82,11 +82,11 @@ export default function Home() {
     fetchData();
   }, [fetchData]);
 
-  // Polling every 30s for real-time updates
+  // Polling every 60s for real-time updates
   useEffect(() => {
     pollRef.current = setInterval(() => {
       fetchData(true);
-    }, 30000);
+    }, 60000);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
