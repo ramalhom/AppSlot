@@ -29,22 +29,18 @@ const isLocalDev = !process.env.BLOB_READ_WRITE_TOKEN;
 let localData: AppData | null = null;
 
 export async function getData(): Promise<AppData> {
-  // Mode développement sans Vercel Blob
-  if (isLocalDev) {
-    if (!localData) {
-      localData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    }
-    return localData!;
-  }
-
   const blobs = await list({ prefix: BLOB_KEY });
   const blob = blobs.blobs.find((item) => item.pathname === BLOB_KEY);
 
+  console.log('Blob trouvé :', blob?.pathname, blob?.url);
+
   if (!blob) {
-    return await saveData(DEFAULT_DATA);
+    throw new Error(`Blob introuvable : ${BLOB_KEY}`);
   }
 
   const response = await fetch(blob.url, { cache: 'no-store' });
+
+  console.log('Réponse Blob :', response.status, response.headers.get('content-type'));
 
   if (!response.ok) {
     throw new Error(`Lecture du Blob impossible : HTTP ${response.status}`);
@@ -53,7 +49,7 @@ export async function getData(): Promise<AppData> {
   const contentType = response.headers.get('content-type') ?? '';
   if (!contentType.includes('application/json')) {
     const preview = (await response.text()).slice(0, 200);
-    throw new Error(`Le Blob ne renvoie pas du JSON (${contentType}) : ${preview}`);
+    throw new Error(`Réponse non JSON (${contentType}) : ${preview}`);
   }
 
   return (await response.json()) as AppData;
