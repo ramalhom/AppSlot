@@ -1,4 +1,4 @@
-import { put, get, list } from '@vercel/blob';
+import { put, get } from '@vercel/blob';
 import { AppData, Match } from './types';
 
 const BLOB_KEY = 'sensler-cup-data.json';
@@ -29,17 +29,34 @@ const isLocalDev = !process.env.BLOB_READ_WRITE_TOKEN;
 let localData: AppData | null = null;
 
 export async function getData(): Promise<AppData> {
-  const blobs = await list({ prefix: BLOB_KEY });
-  const blob = blobs.blobs.find((item) => item.pathname === BLOB_KEY);
-  if (!blob) return await saveData(DEFAULT_DATA);
+  try {
+    const result = await get(BLOB_KEY, {
+      access: 'public',
+      useCache: false,
+    });
 
-  const result = await get(blob.url, { access: 'public' });
-  if (!result || result.statusCode !== 200 || !result.stream) {
-    throw new Error('Impossible de lire le Blob');
+    // Premier démarrage : le fichier n'existe pas encore.
+    if (!result) {
+      return await saveData(DEFAULT_DATA);
+    }
+
+    if (result.statusCode !== 200 || !result.stream) {
+      throw new Error(
+        `Lecture du Blob impossible (statut ${result.statusCode})`
+      );
+    }
+
+    const text = await new Response(result.stream).text();
+    const data = JSON.parse(text) as AppData;
+
+    return data;
+  } catch (error) {
+    console.error('Erreur lecture données:', error);
+
+    // Ne pas renvoyer les données par défaut ici :
+    // cela pourrait masquer une panne et écraser les données existantes.
+    throw new Error('Impossible de lire les données enregistrées');
   }
-
-  return JSON.parse(await new Response(result.stream).text()) as AppData;
-
 }
 
 export async function saveData(data: AppData): Promise<AppData> {
