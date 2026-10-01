@@ -110,12 +110,13 @@ export default function Home() {
         // Save name for future use
         localStorage.setItem('arbitre_name', nomArbitre);
         setMyName(nomArbitre);
-        setSignupModal(null);
+
         addToast(`✅ Inscription confirmée pour ${match.equipeDomicile} - ${match.equipeExterieur} !`, 'success');
       } else {
         addToast(json.error || 'Erreur lors de l\'inscription', 'error');
       }
       void fetchData(true);
+      setSignupModal(null);
     } catch {
       addToast('Erreur de connexion', 'error');
     }
@@ -138,6 +139,7 @@ export default function Home() {
         addToast(json.error || 'Erreur lors de la désinscription', 'error');
       }
       void fetchData(true);
+      setSignupModal(null);
     } catch {
       addToast('Erreur de connexion', 'error');
     }
