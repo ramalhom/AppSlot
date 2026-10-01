@@ -56,6 +56,7 @@ export async function saveData(data: AppData): Promise<AppData> {
       access: 'public',
       contentType: 'application/json',
       addRandomSuffix: false,
+      allowOverwrite: true,
     });
     return updatedData;
   } catch (error) {
