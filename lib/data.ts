@@ -1,4 +1,4 @@
-import { put, head, list } from '@vercel/blob';
+import { put, get, list } from '@vercel/blob';
 import { AppData, Match } from './types';
 
 const BLOB_KEY = 'sensler-cup-data.json';
@@ -31,28 +31,14 @@ let localData: AppData | null = null;
 export async function getData(): Promise<AppData> {
   const blobs = await list({ prefix: BLOB_KEY });
   const blob = blobs.blobs.find((item) => item.pathname === BLOB_KEY);
+  if (!blob) return await saveData(DEFAULT_DATA);
 
-  console.log('Blob trouvé :', blob?.pathname, blob?.url);
-
-  if (!blob) {
-    throw new Error(`Blob introuvable : ${BLOB_KEY}`);
+  const result = await get(blob.url, { access: 'public' });
+  if (!result || result.statusCode !== 200 || !result.stream) {
+    throw new Error('Impossible de lire le Blob');
   }
 
-  const response = await fetch(blob.url, { cache: 'no-store' });
-
-  console.log('Réponse Blob :', response.status, response.headers.get('content-type'));
-
-  if (!response.ok) {
-    throw new Error(`Lecture du Blob impossible : HTTP ${response.status}`);
-  }
-
-  const contentType = response.headers.get('content-type') ?? '';
-  if (!contentType.includes('application/json')) {
-    const preview = (await response.text()).slice(0, 200);
-    throw new Error(`Réponse non JSON (${contentType}) : ${preview}`);
-  }
-
-  return (await response.json()) as AppData;
+  return JSON.parse(await new Response(result.stream).text()) as AppData;
 
 }
 
