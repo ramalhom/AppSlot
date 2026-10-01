@@ -37,22 +37,27 @@ export async function getData(): Promise<AppData> {
     return localData!;
   }
 
-  try {
-    // Essayer de récupérer le blob existant
-    const blobs = await list({ prefix: BLOB_KEY });
+  const blobs = await list({ prefix: BLOB_KEY });
+  const blob = blobs.blobs.find((item) => item.pathname === BLOB_KEY);
 
-    if (blobs.blobs.length > 0) {
-      const response = await fetch(blobs.blobs[0].url);
-      const data = await response.json() as AppData;
-      return data;
-    }
-
-    // Premier démarrage : créer le blob avec les données par défaut
+  if (!blob) {
     return await saveData(DEFAULT_DATA);
-  } catch (error) {
-    console.error('Erreur lecture données:', error);
-    return JSON.parse(JSON.stringify(DEFAULT_DATA));
   }
+
+  const response = await fetch(blob.url, { cache: 'no-store' });
+
+  if (!response.ok) {
+    throw new Error(`Lecture du Blob impossible : HTTP ${response.status}`);
+  }
+
+  const contentType = response.headers.get('content-type') ?? '';
+  if (!contentType.includes('application/json')) {
+    const preview = (await response.text()).slice(0, 200);
+    throw new Error(`Le Blob ne renvoie pas du JSON (${contentType}) : ${preview}`);
+  }
+
+  return (await response.json()) as AppData;
+
 }
 
 export async function saveData(data: AppData): Promise<AppData> {
